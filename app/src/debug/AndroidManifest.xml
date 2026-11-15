@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Debug builds talk to the API on the developer's machine over plain http. Release
+         builds don't get this file, so they refuse anything but https. -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>

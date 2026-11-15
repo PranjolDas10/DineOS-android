@@ -1,0 +1,7095 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DineOS",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Refresh",
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout",
+        "operationId": "logout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Me",
+        "description": "Who is signed in, and the restaurant's clock. RLS limits both queries to the caller's\ntenant, so neither needs a tenant filter.",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/suppliers": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Create Supplier",
+        "operationId": "create_supplier",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplierCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "List Suppliers",
+        "operationId": "list_suppliers",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_SupplierOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/suppliers/{supplier_id}": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Get Supplier",
+        "operationId": "get_supplier",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "supplier_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Supplier Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Update Supplier",
+        "operationId": "update_supplier",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "supplier_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Supplier Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplierUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ingredients": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Create Ingredient",
+        "operationId": "create_ingredient",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngredientCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "List Ingredients",
+        "operationId": "list_ingredients",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_IngredientOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ingredients/{ingredient_id}": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Get Ingredient",
+        "operationId": "get_ingredient",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ingredient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ingredient Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Update Ingredient",
+        "operationId": "update_ingredient",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ingredient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ingredient Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngredientUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ingredients/{ingredient_id}/prices": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Add Price",
+        "operationId": "add_price",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ingredient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ingredient Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "List Prices",
+        "operationId": "list_prices",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ingredient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ingredient Id"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_PriceOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/recipes": {
+      "post": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Create Recipe",
+        "operationId": "create_recipe",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "List Recipes",
+        "operationId": "list_recipes",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_RecipeOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/recipes/{recipe_id}": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Get Recipe",
+        "operationId": "get_recipe",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recipe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recipe Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Update Recipe",
+        "operationId": "update_recipe",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recipe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recipe Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/recipes/{recipe_id}/lines": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Get Lines",
+        "operationId": "get_lines",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recipe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recipe Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lines_LineOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Replace Lines",
+        "operationId": "replace_lines",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recipe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recipe Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lines_LineIn_"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lines_LineOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/menu-items": {
+      "post": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Create Menu Item",
+        "operationId": "create_menu_item",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MenuItemCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MenuItemOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "List Menu Items",
+        "operationId": "list_menu_items",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MenuItemOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/menu-items/{item_id}": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Get Menu Item",
+        "operationId": "get_menu_item",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MenuItemOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Update Menu Item",
+        "operationId": "update_menu_item",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MenuItemUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MenuItemOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/recipes/{recipe_id}/cost": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Get Recipe Cost",
+        "operationId": "get_recipe_cost",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recipe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recipe Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeCostOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/menu-items/{item_id}/cost": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Get Dish Cost",
+        "operationId": "get_dish_cost",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishCost"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/food-cost": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Food Cost Report",
+        "operationId": "food_cost_report",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FoodCostReport"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/reports/margin-watch": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Margin Watch",
+        "description": "Composed here, not in menu.service: sales volume belongs to orders, and orders.service\nalready imports menu.service, so the service can't import it back.",
+        "operationId": "margin_watch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "default": 28,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarginWatch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/menu-matrix": {
+      "get": {
+        "tags": [
+          "menu"
+        ],
+        "summary": "Menu Matrix",
+        "operationId": "menu_matrix",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "default": 28,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MenuMatrix"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/receipts/upload-url": {
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Receipt Upload Url",
+        "description": "Step 1: get a short-lived URL, then PUT the photo straight to storage with the same\nContent-Type. The API never handles image bytes.",
+        "operationId": "receipt_upload_url",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadUrlIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadUrlOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/receipts": {
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Create Receipt",
+        "description": "Step 2: after the upload succeeds, register it. Parsing starts in the background.",
+        "operationId": "create_receipt",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "List Receipts",
+        "operationId": "list_receipts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ReceiptOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/receipts/{receipt_id}": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Get Receipt",
+        "operationId": "get_receipt",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Receipt Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/receipts/{receipt_id}/confirm": {
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Confirm Receipt",
+        "description": "Owner-reviewed values become prices and an eval label. Every line must be decided.",
+        "operationId": "confirm_receipt",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff": {
+      "post": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "Create Staff",
+        "operationId": "create_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "List Staff",
+        "operationId": "list_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_StaffOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff/{staff_id}": {
+      "get": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "Get Staff",
+        "operationId": "get_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Staff Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "Update Staff",
+        "operationId": "update_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "staff_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Staff Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/shifts": {
+      "post": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "Create Shift",
+        "description": "409 if this person already has an overlapping shift (enforced by the database).",
+        "operationId": "create_shift",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "List Shifts",
+        "operationId": "list_shifts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "End"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/shifts/{shift_id}": {
+      "patch": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "Move Shift",
+        "operationId": "move_shift",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "shift_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Shift Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "Delete Shift",
+        "operationId": "delete_shift",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "shift_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Shift Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/labor-cost": {
+      "get": {
+        "tags": [
+          "scheduling"
+        ],
+        "summary": "Labor Cost",
+        "operationId": "labor_cost",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LaborReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/checklists/templates": {
+      "post": {
+        "tags": [
+          "checklists"
+        ],
+        "summary": "Create Template",
+        "operationId": "create_template",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "checklists"
+        ],
+        "summary": "List Templates",
+        "operationId": "list_templates",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_TemplateOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/checklists/templates/{template_id}": {
+      "patch": {
+        "tags": [
+          "checklists"
+        ],
+        "summary": "Update Template",
+        "description": "Changes apply from the next run; today's run keeps the items it started with.",
+        "operationId": "update_template",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/checklists/today": {
+      "get": {
+        "tags": [
+          "checklists"
+        ],
+        "summary": "Today",
+        "description": "Runs for a business day (default: today, restaurant time). Creates them if the daily\njob hasn't yet, and re-seeds the daily job chain if it ever broke.",
+        "operationId": "today",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Day"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Today"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/checklists/runs/{run_id}/checks": {
+      "post": {
+        "tags": [
+          "checklists"
+        ],
+        "summary": "Record Checks",
+        "operationId": "record_checks",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChecksIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/alerts": {
+      "get": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "List Alerts",
+        "description": "Newest first. ponytail: no cursor; the Today screen shows the latest few.",
+        "operationId": "list_alerts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "unread",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Unread"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/alerts/{alert_id}/read": {
+      "post": {
+        "tags": [
+          "alerts"
+        ],
+        "summary": "Mark Read",
+        "description": "Idempotent: marking an already-read alert keeps its first read time.",
+        "operationId": "mark_read",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/imports/upload-url": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Import Upload Url",
+        "description": "Step 1: upload the sales export (CSV) straight to storage with this URL.",
+        "operationId": "import_upload_url",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadUrlOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/imports": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create Import",
+        "description": "Step 2: register the upload; orders are imported in the background.",
+        "operationId": "create_import",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "List Imports",
+        "operationId": "list_imports",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ImportOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/imports/{import_id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get Import",
+        "operationId": "get_import",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "import_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Import Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "List Orders",
+        "description": "The unified inbox: every channel's orders in one time window (max 31 days).",
+        "operationId": "list_orders",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "End"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/unmatched": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Unmatched",
+        "description": "Sold items that match no menu item (default: the last 28 days).",
+        "operationId": "unmatched",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnmatchedSales"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/{order_id}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get Order",
+        "operationId": "get_order",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/orders/replay": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Replay",
+        "description": "Rebuild all orders from the event log in the background (e.g. after renaming menu\nitems, so old sales map to them).",
+        "operationId": "replay",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Replay"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channel-fees": {
+      "get": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "List Fees",
+        "operationId": "list_fees",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChannelFee"
+                  },
+                  "type": "array",
+                  "title": "Response List Fees"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/channel-fees/{channel}": {
+      "put": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Set Fee",
+        "description": "Applies to orders posted from now on; past postings keep the fee they were posted with.",
+        "operationId": "set_fee",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "channel",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40,
+              "title": "Channel"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelFeeIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelFee"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports/profit": {
+      "get": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Profit",
+        "operationId": "profit",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfitReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Healthz",
+        "description": "Liveness: the process is up. Never touches dependencies.",
+        "operationId": "healthz",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Healthz"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "summary": "Readyz",
+        "description": "Readiness: can serve traffic, i.e. the database answers.",
+        "operationId": "readyz",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AlertList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AlertOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "AlertList"
+      },
+      "AlertOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "body",
+          "read_at",
+          "created_at"
+        ],
+        "title": "AlertOut"
+      },
+      "BaseUnit": {
+        "type": "string",
+        "enum": [
+          "g",
+          "ml",
+          "each"
+        ],
+        "title": "BaseUnit"
+      },
+      "ChannelFee": {
+        "properties": {
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "commission_bps": {
+            "type": "integer",
+            "title": "Commission Bps"
+          }
+        },
+        "type": "object",
+        "required": [
+          "channel",
+          "commission_bps"
+        ],
+        "title": "ChannelFee"
+      },
+      "ChannelFeeIn": {
+        "properties": {
+          "commission_bps": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Commission Bps",
+            "description": "30% = 3000"
+          }
+        },
+        "type": "object",
+        "required": [
+          "commission_bps"
+        ],
+        "title": "ChannelFeeIn"
+      },
+      "ChannelProfit": {
+        "properties": {
+          "revenue_cents": {
+            "type": "integer",
+            "title": "Revenue Cents"
+          },
+          "commission_cents": {
+            "type": "integer",
+            "title": "Commission Cents"
+          },
+          "food_cost_cents": {
+            "type": "integer",
+            "title": "Food Cost Cents"
+          },
+          "gross_profit_cents": {
+            "type": "integer",
+            "title": "Gross Profit Cents"
+          },
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "labor_cents": {
+            "type": "integer",
+            "title": "Labor Cents"
+          },
+          "profit_cents": {
+            "type": "integer",
+            "title": "Profit Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revenue_cents",
+          "commission_cents",
+          "food_cost_cents",
+          "gross_profit_cents",
+          "channel",
+          "labor_cents",
+          "profit_cents"
+        ],
+        "title": "ChannelProfit"
+      },
+      "CheckIn": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Client-generated op id (UUIDv7): makes sync retries no-ops"
+          },
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "checked": {
+            "type": "boolean",
+            "title": "Checked",
+            "default": true
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked At",
+            "description": "When it happened on the device"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "checked_at"
+        ],
+        "title": "CheckIn"
+      },
+      "ChecksIn": {
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/CheckIn"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Checks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "checks"
+        ],
+        "title": "ChecksIn"
+      },
+      "ConfirmIn": {
+        "properties": {
+          "supplier_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Id"
+          },
+          "supplier_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Name"
+          },
+          "receipt_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Date"
+          },
+          "total_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Cents"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/ConfirmLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lines"
+        ],
+        "title": "ConfirmIn"
+      },
+      "ConfirmLine": {
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Line Id"
+          },
+          "ingredient_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Id"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Description"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "unit": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Unit"
+          },
+          "line_total_cents": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Line Total Cents"
+          },
+          "base_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Qty"
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_id",
+          "ingredient_id",
+          "description",
+          "quantity",
+          "unit",
+          "line_total_cents"
+        ],
+        "title": "ConfirmLine"
+      },
+      "CostDriver": {
+        "properties": {
+          "ingredient_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Ingredient Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "delta_cents": {
+            "type": "integer",
+            "title": "Delta Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ingredient_id",
+          "name",
+          "delta_cents"
+        ],
+        "title": "CostDriver"
+      },
+      "DayProfit": {
+        "properties": {
+          "revenue_cents": {
+            "type": "integer",
+            "title": "Revenue Cents"
+          },
+          "commission_cents": {
+            "type": "integer",
+            "title": "Commission Cents"
+          },
+          "food_cost_cents": {
+            "type": "integer",
+            "title": "Food Cost Cents"
+          },
+          "gross_profit_cents": {
+            "type": "integer",
+            "title": "Gross Profit Cents"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "labor_cents": {
+            "type": "integer",
+            "title": "Labor Cents"
+          },
+          "profit_cents": {
+            "type": "integer",
+            "title": "Profit Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revenue_cents",
+          "commission_cents",
+          "food_cost_cents",
+          "gross_profit_cents",
+          "date",
+          "labor_cents",
+          "profit_cents"
+        ],
+        "title": "DayProfit"
+      },
+      "DishCost": {
+        "properties": {
+          "menu_item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Menu Item Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "price_cents": {
+            "type": "integer",
+            "title": "Price Cents"
+          },
+          "recipe_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Name"
+          },
+          "cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Cents"
+          },
+          "margin_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin Cents"
+          },
+          "food_cost_pct": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Food Cost Pct"
+          },
+          "empty_recipes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Empty Recipes"
+          },
+          "ingredients": {
+            "items": {
+              "$ref": "#/components/schemas/DishIngredient"
+            },
+            "type": "array",
+            "title": "Ingredients"
+          }
+        },
+        "type": "object",
+        "required": [
+          "menu_item_id",
+          "name",
+          "price_cents",
+          "recipe_name",
+          "cost_cents",
+          "margin_cents",
+          "food_cost_pct",
+          "empty_recipes",
+          "ingredients"
+        ],
+        "title": "DishCost",
+        "description": "What goes into one plate of a menu item, down to raw ingredients. Null cost means\nunknown: an ingredient below has no price, or a recipe in `empty_recipes` has no lines."
+      },
+      "DishImpact": {
+        "properties": {
+          "menu_item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Menu Item Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "price_cents": {
+            "type": "integer",
+            "title": "Price Cents"
+          },
+          "cost_before_cents": {
+            "type": "integer",
+            "title": "Cost Before Cents"
+          },
+          "cost_after_cents": {
+            "type": "integer",
+            "title": "Cost After Cents"
+          },
+          "food_cost_pct_before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Food Cost Pct Before"
+          },
+          "food_cost_pct_after": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Food Cost Pct After"
+          },
+          "units_sold": {
+            "type": "string",
+            "title": "Units Sold"
+          },
+          "weekly_impact_cents": {
+            "type": "integer",
+            "title": "Weekly Impact Cents"
+          },
+          "drivers": {
+            "items": {
+              "$ref": "#/components/schemas/CostDriver"
+            },
+            "type": "array",
+            "title": "Drivers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "menu_item_id",
+          "name",
+          "price_cents",
+          "cost_before_cents",
+          "cost_after_cents",
+          "food_cost_pct_before",
+          "food_cost_pct_after",
+          "units_sold",
+          "weekly_impact_cents",
+          "drivers"
+        ],
+        "title": "DishImpact"
+      },
+      "DishIngredient": {
+        "properties": {
+          "ingredient_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Ingredient Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "base_unit": {
+            "$ref": "#/components/schemas/BaseUnit"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Via"
+          },
+          "qty": {
+            "type": "string",
+            "title": "Qty"
+          },
+          "unit_cents": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cents"
+          },
+          "cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Cents"
+          },
+          "share_pct": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Pct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ingredient_id",
+          "name",
+          "base_unit",
+          "via",
+          "qty",
+          "unit_cents",
+          "cost_cents",
+          "share_pct"
+        ],
+        "title": "DishIngredient",
+        "description": "One raw ingredient in a plate. `via` names the sub-recipe it arrives in (null when the\ndish's own recipe uses it directly), so the same ingredient can appear once per route."
+      },
+      "DishProfit": {
+        "properties": {
+          "revenue_cents": {
+            "type": "integer",
+            "title": "Revenue Cents"
+          },
+          "commission_cents": {
+            "type": "integer",
+            "title": "Commission Cents"
+          },
+          "food_cost_cents": {
+            "type": "integer",
+            "title": "Food Cost Cents"
+          },
+          "gross_profit_cents": {
+            "type": "integer",
+            "title": "Gross Profit Cents"
+          },
+          "menu_item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Menu Item Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "revenue_cents",
+          "commission_cents",
+          "food_cost_cents",
+          "gross_profit_cents",
+          "menu_item_id",
+          "name"
+        ],
+        "title": "DishProfit"
+      },
+      "FoodCostItem": {
+        "properties": {
+          "menu_item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Menu Item Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Id"
+          },
+          "price_cents": {
+            "type": "integer",
+            "title": "Price Cents"
+          },
+          "cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Cents"
+          },
+          "margin_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin Cents"
+          },
+          "food_cost_pct": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Food Cost Pct"
+          },
+          "unpriced_ingredient_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Unpriced Ingredient Ids"
+          },
+          "empty_recipe_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Empty Recipe Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "menu_item_id",
+          "name",
+          "recipe_id",
+          "price_cents",
+          "cost_cents",
+          "margin_cents",
+          "food_cost_pct",
+          "unpriced_ingredient_ids",
+          "empty_recipe_ids"
+        ],
+        "title": "FoodCostItem"
+      },
+      "FoodCostReport": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FoodCostItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "FoodCostReport"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ImportCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 40,
+            "title": "Source"
+          },
+          "object_key": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Object Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "object_key"
+        ],
+        "title": "ImportCreate"
+      },
+      "ImportOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "orders_new": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orders New"
+          },
+          "orders_updated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orders Updated"
+          },
+          "duplicates": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicates"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "status",
+          "orders_new",
+          "orders_updated",
+          "duplicates",
+          "error",
+          "created_at"
+        ],
+        "title": "ImportOut"
+      },
+      "IngredientCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "base_unit": {
+            "$ref": "#/components/schemas/BaseUnit"
+          },
+          "default_supplier_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Supplier Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "base_unit"
+        ],
+        "title": "IngredientCreate"
+      },
+      "IngredientOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "base_unit": {
+            "$ref": "#/components/schemas/BaseUnit"
+          },
+          "default_supplier_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Supplier Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "base_unit",
+          "default_supplier_id",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "IngredientOut"
+      },
+      "IngredientUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "default_supplier_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Supplier Id"
+          }
+        },
+        "type": "object",
+        "title": "IngredientUpdate"
+      },
+      "Item": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label"
+        ],
+        "title": "Item"
+      },
+      "LaborDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "hours": {
+            "type": "string",
+            "title": "Hours"
+          },
+          "labor_cents": {
+            "type": "integer",
+            "title": "Labor Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "hours",
+          "labor_cents"
+        ],
+        "title": "LaborDay"
+      },
+      "LaborReport": {
+        "properties": {
+          "timezone": {
+            "type": "string",
+            "title": "Timezone"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/LaborDay"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "total_hours": {
+            "type": "string",
+            "title": "Total Hours"
+          },
+          "total_labor_cents": {
+            "type": "integer",
+            "title": "Total Labor Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timezone",
+          "days",
+          "total_hours",
+          "total_labor_cents"
+        ],
+        "title": "LaborReport"
+      },
+      "LineCostOut": {
+        "properties": {
+          "ingredient_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Id"
+          },
+          "sub_recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Recipe Id"
+          },
+          "qty": {
+            "type": "string",
+            "title": "Qty"
+          },
+          "cost_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ingredient_id",
+          "sub_recipe_id",
+          "qty",
+          "cost_cents"
+        ],
+        "title": "LineCostOut"
+      },
+      "LineIn": {
+        "properties": {
+          "ingredient_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Id"
+          },
+          "sub_recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Recipe Id"
+          },
+          "qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Qty"
+          }
+        },
+        "type": "object",
+        "required": [
+          "qty"
+        ],
+        "title": "LineIn"
+      },
+      "LineOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "ingredient_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Id"
+          },
+          "sub_recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Recipe Id"
+          },
+          "qty": {
+            "type": "string",
+            "title": "Qty"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "ingredient_id",
+          "sub_recipe_id",
+          "qty"
+        ],
+        "title": "LineOut"
+      },
+      "Lines_LineIn_": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineIn"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lines"
+        ],
+        "title": "Lines[LineIn]"
+      },
+      "Lines_LineOut_": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineOut"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lines"
+        ],
+        "title": "Lines[LineOut]"
+      },
+      "LoginIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginIn"
+      },
+      "MarginWatch": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "weekly_impact_cents": {
+            "type": "integer",
+            "title": "Weekly Impact Cents"
+          },
+          "ingredients": {
+            "items": {
+              "$ref": "#/components/schemas/PriceChange"
+            },
+            "type": "array",
+            "title": "Ingredients"
+          },
+          "dishes": {
+            "items": {
+              "$ref": "#/components/schemas/DishImpact"
+            },
+            "type": "array",
+            "title": "Dishes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "weekly_impact_cents",
+          "ingredients",
+          "dishes"
+        ],
+        "title": "MarginWatch",
+        "description": "Ingredient price changes over the last `days` days and what they did to each dish."
+      },
+      "MatrixDish": {
+        "properties": {
+          "menu_item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Menu Item Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "units_sold": {
+            "type": "string",
+            "title": "Units Sold"
+          },
+          "margin_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin Cents"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "star",
+                  "plowhorse",
+                  "puzzle",
+                  "dog"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          }
+        },
+        "type": "object",
+        "required": [
+          "menu_item_id",
+          "name",
+          "units_sold",
+          "margin_cents",
+          "kind"
+        ],
+        "title": "MatrixDish"
+      },
+      "Me": {
+        "properties": {
+          "restaurant": {
+            "type": "string",
+            "title": "Restaurant"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone"
+          },
+          "today": {
+            "type": "string",
+            "format": "date",
+            "title": "Today"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "restaurant",
+          "timezone",
+          "today",
+          "email"
+        ],
+        "title": "Me"
+      },
+      "MenuItemCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "price_cents": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Price Cents"
+          },
+          "recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Id"
+          },
+          "portion_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Portion Qty",
+            "default": "1"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "price_cents"
+        ],
+        "title": "MenuItemCreate"
+      },
+      "MenuItemOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "price_cents": {
+            "type": "integer",
+            "title": "Price Cents"
+          },
+          "recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Id"
+          },
+          "portion_qty": {
+            "type": "string",
+            "title": "Portion Qty"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "price_cents",
+          "recipe_id",
+          "portion_qty",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MenuItemOut"
+      },
+      "MenuItemUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "price_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Cents"
+          },
+          "recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe Id"
+          },
+          "portion_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portion Qty"
+          }
+        },
+        "type": "object",
+        "title": "MenuItemUpdate"
+      },
+      "MenuMatrix": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "popularity_bar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Popularity Bar"
+          },
+          "margin_bar_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin Bar Cents"
+          },
+          "dishes": {
+            "items": {
+              "$ref": "#/components/schemas/MatrixDish"
+            },
+            "type": "array",
+            "title": "Dishes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "popularity_bar",
+          "margin_bar_cents",
+          "dishes"
+        ],
+        "title": "MenuMatrix",
+        "description": "Menu engineering: dishes by plates sold and margin per plate. The bars are the lines\nbetween the four kinds; null when nothing with a known cost sold in the period."
+      },
+      "OrderDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "external_id": {
+            "type": "string",
+            "title": "External Id"
+          },
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "placed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Placed At"
+          },
+          "subtotal_cents": {
+            "type": "integer",
+            "title": "Subtotal Cents"
+          },
+          "tax_cents": {
+            "type": "integer",
+            "title": "Tax Cents"
+          },
+          "tip_cents": {
+            "type": "integer",
+            "title": "Tip Cents"
+          },
+          "total_cents": {
+            "type": "integer",
+            "title": "Total Cents"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "external_id",
+          "channel",
+          "placed_at",
+          "subtotal_cents",
+          "tax_cents",
+          "tip_cents",
+          "total_cents",
+          "items"
+        ],
+        "title": "OrderDetail"
+      },
+      "OrderItemOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "menu_item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Menu Item Id"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "unit_price_cents": {
+            "type": "integer",
+            "title": "Unit Price Cents"
+          },
+          "line_total_cents": {
+            "type": "integer",
+            "title": "Line Total Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "menu_item_id",
+          "quantity",
+          "unit_price_cents",
+          "line_total_cents"
+        ],
+        "title": "OrderItemOut"
+      },
+      "OrderList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "OrderList"
+      },
+      "OrderOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "external_id": {
+            "type": "string",
+            "title": "External Id"
+          },
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "placed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Placed At"
+          },
+          "subtotal_cents": {
+            "type": "integer",
+            "title": "Subtotal Cents"
+          },
+          "tax_cents": {
+            "type": "integer",
+            "title": "Tax Cents"
+          },
+          "tip_cents": {
+            "type": "integer",
+            "title": "Tip Cents"
+          },
+          "total_cents": {
+            "type": "integer",
+            "title": "Total Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "external_id",
+          "channel",
+          "placed_at",
+          "subtotal_cents",
+          "tax_cents",
+          "tip_cents",
+          "total_cents"
+        ],
+        "title": "OrderOut"
+      },
+      "Page_ImportOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ImportOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[ImportOut]"
+      },
+      "Page_IngredientOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[IngredientOut]"
+      },
+      "Page_MenuItemOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MenuItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[MenuItemOut]"
+      },
+      "Page_PriceOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PriceOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[PriceOut]"
+      },
+      "Page_ReceiptOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[ReceiptOut]"
+      },
+      "Page_RecipeOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RecipeOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[RecipeOut]"
+      },
+      "Page_StaffOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StaffOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[StaffOut]"
+      },
+      "Page_SupplierOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SupplierOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[SupplierOut]"
+      },
+      "Page_TemplateOut_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TemplateOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "Page[TemplateOut]"
+      },
+      "PriceChange": {
+        "properties": {
+          "ingredient_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Ingredient Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "base_unit": {
+            "$ref": "#/components/schemas/BaseUnit"
+          },
+          "unit_cents_before": {
+            "type": "string",
+            "title": "Unit Cents Before"
+          },
+          "unit_cents_after": {
+            "type": "string",
+            "title": "Unit Cents After"
+          },
+          "change_pct": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Pct"
+          },
+          "dishes_affected": {
+            "type": "integer",
+            "title": "Dishes Affected"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ingredient_id",
+          "name",
+          "base_unit",
+          "unit_cents_before",
+          "unit_cents_after",
+          "change_pct",
+          "dishes_affected"
+        ],
+        "title": "PriceChange"
+      },
+      "PriceCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "supplier_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Id"
+          },
+          "pack_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Pack Qty",
+            "description": "Pack size in the ingredient's base unit"
+          },
+          "pack_price_cents": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Pack Price Cents"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pack_qty",
+          "pack_price_cents"
+        ],
+        "title": "PriceCreate"
+      },
+      "PriceOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "ingredient_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Ingredient Id"
+          },
+          "supplier_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Id"
+          },
+          "pack_qty": {
+            "type": "string",
+            "title": "Pack Qty"
+          },
+          "pack_price_cents": {
+            "type": "integer",
+            "title": "Pack Price Cents"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Observed At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "ingredient_id",
+          "supplier_id",
+          "pack_qty",
+          "pack_price_cents",
+          "observed_at",
+          "created_at"
+        ],
+        "title": "PriceOut"
+      },
+      "ProfitReport": {
+        "properties": {
+          "labor_cents": {
+            "type": "integer",
+            "title": "Labor Cents"
+          },
+          "sales_with_unknown_food_cost": {
+            "type": "integer",
+            "title": "Sales With Unknown Food Cost"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/DayProfit"
+            },
+            "type": "array",
+            "title": "Daily"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/ChannelProfit"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "dishes": {
+            "items": {
+              "$ref": "#/components/schemas/DishProfit"
+            },
+            "type": "array",
+            "title": "Dishes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "labor_cents",
+          "sales_with_unknown_food_cost",
+          "daily",
+          "channels",
+          "dishes"
+        ],
+        "title": "ProfitReport"
+      },
+      "ReceiptCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "object_key": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Object Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_key"
+        ],
+        "title": "ReceiptCreate"
+      },
+      "ReceiptDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "supplier_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Name"
+          },
+          "receipt_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Date"
+          },
+          "total_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Cents"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "input_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Tokens"
+          },
+          "output_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Tokens"
+          },
+          "failure_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Reason"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "photo_url": {
+            "type": "string",
+            "title": "Photo Url"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptLineOut"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "supplier_name",
+          "receipt_date",
+          "total_cents",
+          "model",
+          "prompt_version",
+          "input_tokens",
+          "output_tokens",
+          "failure_reason",
+          "version",
+          "created_at",
+          "updated_at",
+          "photo_url",
+          "lines"
+        ],
+        "title": "ReceiptDetail"
+      },
+      "ReceiptLineOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "unit_price_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price Cents"
+          },
+          "line_total_cents": {
+            "type": "integer",
+            "title": "Line Total Cents"
+          },
+          "confidence": {
+            "type": "string",
+            "title": "Confidence"
+          },
+          "ingredient_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingredient Id"
+          },
+          "needs_review": {
+            "type": "boolean",
+            "title": "Needs Review",
+            "description": "Low confidence: the UI asks for an explicit check instead of one-tap accept.",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "position",
+          "description",
+          "quantity",
+          "unit",
+          "unit_price_cents",
+          "line_total_cents",
+          "confidence",
+          "ingredient_id",
+          "needs_review"
+        ],
+        "title": "ReceiptLineOut"
+      },
+      "ReceiptOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "supplier_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Name"
+          },
+          "receipt_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Date"
+          },
+          "total_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Cents"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "input_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Tokens"
+          },
+          "output_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Tokens"
+          },
+          "failure_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failure Reason"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "supplier_name",
+          "receipt_date",
+          "total_cents",
+          "model",
+          "prompt_version",
+          "input_tokens",
+          "output_tokens",
+          "failure_reason",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ReceiptOut"
+      },
+      "RecipeCostOut": {
+        "properties": {
+          "recipe_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Recipe Id"
+          },
+          "total_cents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Cents"
+          },
+          "per_unit_cents": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Per Unit Cents"
+          },
+          "unpriced_ingredient_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Unpriced Ingredient Ids"
+          },
+          "empty_recipe_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Empty Recipe Ids"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineCostOut"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recipe_id",
+          "total_cents",
+          "per_unit_cents",
+          "unpriced_ingredient_ids",
+          "empty_recipe_ids",
+          "lines"
+        ],
+        "title": "RecipeCostOut",
+        "description": "Null cost means unknown: see unpriced_ingredient_ids / empty_recipe_ids for why."
+      },
+      "RecipeCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "yield_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Yield Qty"
+          },
+          "yield_unit": {
+            "$ref": "#/components/schemas/BaseUnit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "yield_qty",
+          "yield_unit"
+        ],
+        "title": "RecipeCreate"
+      },
+      "RecipeOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "yield_qty": {
+            "type": "string",
+            "title": "Yield Qty"
+          },
+          "yield_unit": {
+            "$ref": "#/components/schemas/BaseUnit"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "yield_qty",
+          "yield_unit",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "RecipeOut"
+      },
+      "RecipeUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "yield_qty": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yield Qty"
+          }
+        },
+        "type": "object",
+        "title": "RecipeUpdate"
+      },
+      "RefreshIn": {
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Refresh Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshIn"
+      },
+      "RunItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Label"
+          },
+          "checked": {
+            "type": "boolean",
+            "title": "Checked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "checked"
+        ],
+        "title": "RunItem"
+      },
+      "RunOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Template Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "business_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Business Date"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "template_id",
+          "name",
+          "business_date",
+          "due_at",
+          "completed_at",
+          "items",
+          "done",
+          "total"
+        ],
+        "title": "RunOut"
+      },
+      "ShiftCreate": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "staff_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Staff Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "staff_id"
+        ],
+        "title": "ShiftCreate"
+      },
+      "ShiftList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "ShiftList"
+      },
+      "ShiftOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "staff_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Staff Id"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "hourly_rate_cents": {
+            "type": "integer",
+            "title": "Hourly Rate Cents"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "staff_id",
+          "starts_at",
+          "ends_at",
+          "hourly_rate_cents",
+          "note",
+          "version"
+        ],
+        "title": "ShiftOut"
+      },
+      "ShiftUpdate": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at"
+        ],
+        "title": "ShiftUpdate",
+        "description": "Moving a shift. To give it to someone else, delete it and create a new one\n(the new person's rate must be snapshotted)."
+      },
+      "StaffCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "hourly_rate_cents": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Hourly Rate Cents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "hourly_rate_cents"
+        ],
+        "title": "StaffCreate"
+      },
+      "StaffOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "hourly_rate_cents": {
+            "type": "integer",
+            "title": "Hourly Rate Cents"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "hourly_rate_cents",
+          "active",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "StaffOut"
+      },
+      "StaffUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "hourly_rate_cents": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hourly Rate Cents"
+          },
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "title": "StaffUpdate"
+      },
+      "SupplierCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "SupplierCreate"
+      },
+      "SupplierOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "phone",
+          "version",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SupplierOut"
+      },
+      "SupplierUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "title": "SupplierUpdate"
+      },
+      "TemplateCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "days_of_week": {
+            "items": {
+              "type": "integer",
+              "maximum": 6.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "title": "Days Of Week"
+          },
+          "due_minutes": {
+            "type": "integer",
+            "maximum": 2880.0,
+            "minimum": 0.0,
+            "title": "Due Minutes",
+            "description": "Minutes after local midnight"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "days_of_week",
+          "due_minutes",
+          "items"
+        ],
+        "title": "TemplateCreate"
+      },
+      "TemplateOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "days_of_week": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Days Of Week"
+          },
+          "due_minutes": {
+            "type": "integer",
+            "title": "Due Minutes"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "days_of_week",
+          "due_minutes",
+          "items",
+          "active",
+          "version"
+        ],
+        "title": "TemplateOut"
+      },
+      "TemplateUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "days_of_week": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer",
+                  "maximum": 6.0,
+                  "minimum": 0.0
+                },
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Of Week"
+          },
+          "due_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 2880.0,
+                "minimum": 0.0,
+                "description": "Minutes after local midnight"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Minutes"
+          },
+          "items": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Item"
+                },
+                "type": "array",
+                "maxItems": 100,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Items"
+          },
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "title": "TemplateUpdate"
+      },
+      "Today": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/RunOut"
+            },
+            "type": "array",
+            "title": "Runs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "runs"
+        ],
+        "title": "Today"
+      },
+      "TokenPair": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "refresh_token",
+          "token_type",
+          "expires_in"
+        ],
+        "title": "TokenPair"
+      },
+      "UnmatchedItem": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "sales_cents": {
+            "type": "integer",
+            "title": "Sales Cents"
+          },
+          "orders": {
+            "type": "integer",
+            "title": "Orders"
+          },
+          "last_sold_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Sold At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "quantity",
+          "sales_cents",
+          "orders",
+          "last_sold_at"
+        ],
+        "title": "UnmatchedItem"
+      },
+      "UnmatchedSales": {
+        "properties": {
+          "since": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Since"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UnmatchedItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "since",
+          "items"
+        ],
+        "title": "UnmatchedSales",
+        "description": "Sold items with no menu item since `since`: their sales have no food cost attached."
+      },
+      "UploadUrlIn": {
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "title": "Content Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content_type"
+        ],
+        "title": "UploadUrlIn"
+      },
+      "UploadUrlOut": {
+        "properties": {
+          "object_key": {
+            "type": "string",
+            "title": "Object Key"
+          },
+          "upload_url": {
+            "type": "string",
+            "title": "Upload Url"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "object_key",
+          "upload_url",
+          "expires_in"
+        ],
+        "title": "UploadUrlOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

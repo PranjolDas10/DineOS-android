@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">DineOS</string>
+
+    <string name="login_intro">Sign in with the account you use on the dashboard.</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_submit">Sign in</string>
+    <string name="login_busy">Signing in…</string>
+    <string name="login_wrong">That email and password don\'t match an account.</string>
+    <string name="login_slow_down">Too many tries. Wait a minute, then try again.</string>
+    <string name="login_failed">The server couldn\'t sign you in. Try again.</string>
+    <string name="login_offline">Can\'t reach the server. Check the connection and try again.</string>
+
+    <string name="today_title">Today</string>
+    <string name="today_empty_title">No checklist today</string>
+    <string name="today_empty_body">Checklists set up on the dashboard for today show up here.</string>
+    <string name="today_empty_offline">Can\'t reach the server, and nothing is saved on this phone yet. Pull down to try again.</string>
+    <string name="run_progress">%1$d / %2$d</string>
+    <string name="run_due">Due by %1$s</string>
+    <string name="run_overdue">Was due at %1$s</string>
+    <string name="run_complete">All done</string>
+
+    <string name="sync_synced">Synced</string>
+    <string name="sync_offline">Offline</string>
+    <plurals name="sync_pending">
+        <item quantity="one">%1$d to send</item>
+        <item quantity="other">%1$d to send</item>
+    </plurals>
+    <plurals name="sync_offline_pending">
+        <item quantity="one">Offline, %1$d saved here</item>
+        <item quantity="other">Offline, %1$d saved here</item>
+    </plurals>
+
+    <string name="menu_more">More</string>
+    <string name="menu_sign_out">Sign out</string>
+    <string name="stay_signed_in">Stay signed in</string>
+    <string name="sign_out_unsent_title">Some check-offs haven\'t been sent</string>
+    <string name="sign_out_unsent_body">They are saved on this phone only. Signing out now deletes them if the server still can\'t be reached.</string>
+</resources>
