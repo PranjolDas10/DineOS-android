@@ -4,24 +4,31 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -52,19 +59,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.dineos.app.R
@@ -81,48 +93,74 @@ private val Clock = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
 
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
-    Column(
-        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).imePadding().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+    // Centered while the form fits, scrollable when it doesn't (keyboard up, large font, landscape):
+    // the viewport height becomes the scrolling column's minimum, so the weighted spacers still
+    // have space to share. safeDrawing keeps the form clear of the status bar, the cutout and the
+    // keyboard; imePadding is what the keyboard itself pushes the content up by.
+    BoxWithConstraints(
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .imePadding(),
     ) {
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() })
-        Text(stringResource(R.string.login_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        OutlinedTextField(
-            value = vm.email,
-            onValueChange = { vm.email = it },
-            label = { Text(stringResource(R.string.login_email)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        OutlinedTextField(
-            value = vm.password,
-            onValueChange = { vm.password = it },
-            label = { Text(stringResource(R.string.login_password)) },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { vm.signIn() }),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        vm.error?.let { Status(Icons.Rounded.Warning, stringResource(it), MaterialTheme.colorScheme.error) }
-        Button(
-            onClick = vm::signIn,
-            enabled = !vm.busy && vm.email.isNotBlank() && vm.password.isNotEmpty(),
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+        Column(
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .heightIn(min = maxHeight)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(stringResource(if (vm.busy) R.string.login_busy else R.string.login_submit))
+            Spacer(Modifier.weight(1f))
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
+            Text(stringResource(R.string.login_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            OutlinedTextField(
+                value = vm.email,
+                onValueChange = { vm.email = it },
+                label = { Text(stringResource(R.string.login_email)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                // Lets the password manager fill both fields.
+                modifier = Modifier.fillMaxWidth().semantics { contentType = ContentType.EmailAddress },
+            )
+            OutlinedTextField(
+                value = vm.password,
+                onValueChange = { vm.password = it },
+                label = { Text(stringResource(R.string.login_password)) },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { vm.signIn() }),
+                modifier = Modifier.fillMaxWidth().semantics { contentType = ContentType.Password },
+            )
+            vm.error?.let {
+                // Assertive: a failed sign-in interrupts whatever the screen reader was saying.
+                Status(
+                    Icons.Rounded.Warning,
+                    stringResource(it),
+                    MaterialTheme.colorScheme.error,
+                    Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
+                )
+            }
+            Button(
+                onClick = vm::signIn,
+                enabled = !vm.busy && vm.email.isNotBlank() && vm.password.isNotEmpty(),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+            ) {
+                Text(stringResource(if (vm.busy) R.string.login_busy else R.string.login_submit))
+            }
+            Spacer(Modifier.weight(1f))
         }
     }
 }
 
 /** An icon with its words: a state is never told by color alone. */
 @Composable
-private fun Status(icon: ImageVector, text: String, color: Color, modifier: Modifier = Modifier) {
+private fun Status(icon: ImageVector, text: String, color: Color, modifier: Modifier = Modifier, maxLines: Int = Int.MAX_VALUE) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
-        Text(text, color = color, style = MaterialTheme.typography.labelLarge)
+        Text(text, color = color, style = MaterialTheme.typography.labelLarge, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -138,7 +176,21 @@ private fun SyncChip(sync: SyncState) {
             tokens.warn,
         )
     }
-    Status(icon, text, color, Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant).padding(horizontal = 12.dp, vertical = 6.dp))
+    Status(
+        icon,
+        text,
+        color,
+        // Polite: the count changing is worth saying, but never over something else.
+        // The cap keeps the longest state ("Offline, 12 unsent") from squeezing the title and the
+        // overflow button out of the app bar at a large font scale.
+        Modifier
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .widthIn(max = 160.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        maxLines = 1,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

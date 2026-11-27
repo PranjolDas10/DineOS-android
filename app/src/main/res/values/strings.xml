@@ -26,9 +26,10 @@
         <item quantity="one">%1$d to send</item>
         <item quantity="other">%1$d to send</item>
     </plurals>
+    <!-- Short on purpose: this sits in the app bar next to the title and the overflow button. -->
     <plurals name="sync_offline_pending">
-        <item quantity="one">Offline, %1$d saved here</item>
-        <item quantity="other">Offline, %1$d saved here</item>
+        <item quantity="one">Offline, %1$d unsent</item>
+        <item quantity="other">Offline, %1$d unsent</item>
     </plurals>
 
     <string name="menu_more">More</string>
