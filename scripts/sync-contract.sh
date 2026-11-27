@@ -7,4 +7,4 @@ cd "$(dirname "$0")/.."
 cp "$backend/web/openapi.json" contract/openapi.json
 cp "$backend/design/tokens.json" design/tokens.json
 node design/build-tokens.mjs
-git status --short contract design app/src/main/java/dev/dineos/app/ui/theme/Tokens.kt
+git status --short contract design app/src/main/java/dev/dineos/app/ui/theme/Tokens.kt app/src/main/res/values/colors.xml app/src/main/res/values-night/colors.xml
