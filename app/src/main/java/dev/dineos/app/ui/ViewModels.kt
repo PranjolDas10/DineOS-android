@@ -96,10 +96,6 @@ class TodayViewModel @Inject constructor(
             TodayUi(groupRuns(rows), syncState(pending, offline), busy)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUi())
 
-    init {
-        refresh()
-    }
-
     fun refresh() {
         viewModelScope.launch {
             refreshing.value = true

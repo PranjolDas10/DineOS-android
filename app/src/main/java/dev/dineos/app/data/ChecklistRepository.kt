@@ -56,7 +56,10 @@ class ChecklistRepository @Inject constructor(
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
             .build()
-        // Append: a tap made while a sync is running gets its own run right after.
+        // Append, not KEEP: [sync] reads the queue once when it starts, so a tap made while one
+        // is running would never be sent if KEEP dropped the new request. A burst of taps chains
+        // a few runs instead, which costs nothing: sync is idempotent and holds a lock, so the
+        // extra runs find an empty queue and just re-pull the list.
         work.enqueueUniqueWork("sync", ExistingWorkPolicy.APPEND_OR_REPLACE, request)
     }
 
