@@ -1,5 +1,6 @@
 package dev.dineos.app.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -90,64 +92,64 @@ private val Clock = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
 
 @Composable
 fun LoginScreen(vm: LoginViewModel) {
-    // Centered while the form fits, scrollable when it doesn't (keyboard up, large font, landscape):
-    // the viewport height becomes the scrolling column's minimum, so the weighted spacers still
-    // have space to share. safeDrawing keeps the form clear of the status bar, the cutout and the
-    // keyboard; imePadding is what the keyboard itself pushes the content up by.
-    BoxWithConstraints(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .imePadding(),
-    ) {
-        Column(
-            Modifier
-                .verticalScroll(rememberScrollState())
-                .heightIn(min = maxHeight)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Spacer(Modifier.weight(1f))
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
-            Text(stringResource(R.string.login_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            OutlinedTextField(
-                value = vm.email,
-                onValueChange = { vm.email = it },
-                label = { Text(stringResource(R.string.login_email)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                // Lets the password manager fill both fields.
-                modifier = Modifier.fillMaxWidth().semantics { contentType = ContentType.EmailAddress },
-            )
-            OutlinedTextField(
-                value = vm.password,
-                onValueChange = { vm.password = it },
-                label = { Text(stringResource(R.string.login_password)) },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { vm.signIn() }),
-                modifier = Modifier.fillMaxWidth().semantics { contentType = ContentType.Password },
-            )
-            vm.error?.let {
-                // Assertive: a failed sign-in interrupts whatever the screen reader was saying.
-                Status(
-                    Icons.Rounded.Warning,
-                    stringResource(it),
-                    MaterialTheme.colorScheme.error,
-                    Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
-                )
-            }
-            Button(
-                onClick = vm::signIn,
-                enabled = !vm.busy && vm.email.isNotBlank() && vm.password.isNotEmpty(),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+    // A Surface, not a background modifier: the Surface is what sets the content color, and
+    // without one every unstyled Text here keeps Compose's default black, invisible in the dark
+    // theme.
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        // Centered while the form fits, scrollable when it doesn't (keyboard up, large font,
+        // landscape): the viewport height is the scrolling column's minimum height, so the
+        // weighted spacers still have space to share. safeDrawing is the union of the system
+        // bars, the display cutout and the keyboard, which is why imePadding adds nothing today;
+        // it stays as the guarantee that the keyboard can never cover the fields.
+        BoxWithConstraints(Modifier.windowInsetsPadding(WindowInsets.safeDrawing).imePadding()) {
+            Column(
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = maxHeight)
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Text(stringResource(if (vm.busy) R.string.login_busy else R.string.login_submit))
+                Spacer(Modifier.weight(1f))
+                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
+                Text(stringResource(R.string.login_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                OutlinedTextField(
+                    value = vm.email,
+                    onValueChange = { vm.email = it },
+                    label = { Text(stringResource(R.string.login_email)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                    // Lets the password manager fill both fields.
+                    modifier = Modifier.fillMaxWidth().semantics { contentType = ContentType.EmailAddress },
+                )
+                OutlinedTextField(
+                    value = vm.password,
+                    onValueChange = { vm.password = it },
+                    label = { Text(stringResource(R.string.login_password)) },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { vm.signIn() }),
+                    modifier = Modifier.fillMaxWidth().semantics { contentType = ContentType.Password },
+                )
+                vm.error?.let {
+                    // Assertive: a failed sign-in interrupts whatever the screen reader was saying.
+                    Status(
+                        Icons.Rounded.Warning,
+                        stringResource(it),
+                        MaterialTheme.colorScheme.error,
+                        Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
+                    )
+                }
+                Button(
+                    onClick = vm::signIn,
+                    enabled = !vm.busy && vm.email.isNotBlank() && vm.password.isNotEmpty(),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                ) {
+                    Text(stringResource(if (vm.busy) R.string.login_busy else R.string.login_submit))
+                }
+                Spacer(Modifier.weight(1f))
             }
-            Spacer(Modifier.weight(1f))
         }
     }
 }
@@ -210,7 +212,13 @@ fun TodayScreen(vm: TodayViewModel) {
                     IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(56.dp)) {
                         Icon(Icons.Rounded.MoreVert, stringResource(R.string.menu_more))
                     }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenu(
+                        expanded = menuOpen,
+                        onDismissRequest = { menuOpen = false },
+                        // A floating panel is told apart by its edge here, not by a tonal lift or
+                        // a shadow: both are invisible against a near-black page.
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    ) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.menu_sign_out)) },
                             onClick = {
