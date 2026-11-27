@@ -56,6 +56,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,7 +82,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.dineos.app.R
 import dev.dineos.app.data.ItemRow
 import dev.dineos.app.ui.theme.LocalTokens
-import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -194,8 +194,10 @@ private fun SyncChip(sync: SyncState) {
 @Composable
 fun TodayScreen(vm: TodayViewModel) {
     val ui by vm.ui.collectAsStateWithLifecycle()
-    var menuOpen by remember { mutableStateOf(false) }
-    var confirmSignOut by remember { mutableStateOf(false) }
+    // Saved: a rotation or a trip through the camera must not silently close the menu or the
+    // dialog that is asking about unsent check-offs.
+    var menuOpen by rememberSaveable { mutableStateOf(false) }
+    var confirmSignOut by rememberSaveable { mutableStateOf(false) }
     // Refresh whenever the screen appears (also after signing in again), not once per ViewModel.
     LaunchedEffect(Unit) { vm.refresh() }
 
@@ -205,7 +207,9 @@ fun TodayScreen(vm: TodayViewModel) {
                 title = { Text(stringResource(R.string.today_title)) },
                 actions = {
                     SyncChip(ui.sync)
-                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, stringResource(R.string.menu_more)) }
+                    IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(56.dp)) {
+                        Icon(Icons.Rounded.MoreVert, stringResource(R.string.menu_more))
+                    }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.menu_sign_out)) },
@@ -272,7 +276,7 @@ private fun RunHeader(run: RunUi) {
         )
         when {
             run.complete -> Status(Icons.Rounded.CheckCircle, stringResource(R.string.run_complete), tokens.ok)
-            Instant.now().isAfter(run.dueAt) -> Status(Icons.Rounded.Warning, stringResource(R.string.run_overdue, due), tokens.warn)
+            run.overdue -> Status(Icons.Rounded.Warning, stringResource(R.string.run_overdue, due), tokens.warn)
             else -> Text(stringResource(R.string.run_due, due), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelLarge)
         }
     }

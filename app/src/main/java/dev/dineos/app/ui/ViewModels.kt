@@ -15,10 +15,13 @@ import dev.dineos.app.data.ChecklistRepository
 import dev.dineos.app.data.ItemRow
 import dev.dineos.app.data.Session
 import dev.dineos.app.data.Tokens
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -59,7 +62,7 @@ class LoginViewModel @Inject constructor(private val auth: AuthApi, private val 
 }
 
 /** One checklist run with its lines, as the screen shows it. */
-data class RunUi(val id: String, val name: String, val dueAt: Instant, val items: List<ItemRow>) {
+data class RunUi(val id: String, val name: String, val dueAt: Instant, val overdue: Boolean, val items: List<ItemRow>) {
     val done get() = items.count { it.checked }
     val complete get() = done == items.size
 }
@@ -73,9 +76,13 @@ sealed interface SyncState {
 
 data class TodayUi(val runs: List<RunUi> = emptyList(), val sync: SyncState = SyncState.Synced, val refreshing: Boolean = true)
 
-/** Rows arrive sorted by due time, run, position; consecutive rows of one run form the run. */
-fun groupRuns(rows: List<ItemRow>): List<RunUi> =
-    rows.groupBy { it.runId }.map { (id, items) -> RunUi(id, items.first().runName, Instant.parse(items.first().dueAt), items) }
+/** Rows arrive sorted by due time, run, position; consecutive rows of one run form the run.
+ * [now] decides which runs are overdue, so the screen never reads the clock itself. */
+fun groupRuns(rows: List<ItemRow>, now: Instant): List<RunUi> =
+    rows.groupBy { it.runId }.map { (id, items) ->
+        val dueAt = Instant.parse(items.first().dueAt)
+        RunUi(id, items.first().runName, dueAt, now.isAfter(dueAt), items)
+    }
 
 fun syncState(pending: Int, offline: Boolean): SyncState = when {
     offline -> SyncState.Offline(pending)
@@ -91,9 +98,18 @@ class TodayViewModel @Inject constructor(
 ) : ViewModel() {
     private val refreshing = MutableStateFlow(true)
 
+    /** A tick a minute while the screen is watching, so a run crosses its due time on its own
+     * instead of on the next refresh. Nothing on this screen is finer-grained than a minute. */
+    private val minute: Flow<Instant> = flow {
+        while (true) {
+            emit(Instant.now())
+            delay(60_000)
+        }
+    }
+
     val ui: StateFlow<TodayUi> =
-        combine(repository.items, repository.pendingCount, repository.offline, refreshing) { rows, pending, offline, busy ->
-            TodayUi(groupRuns(rows), syncState(pending, offline), busy)
+        combine(repository.items, repository.pendingCount, repository.offline, refreshing, minute) { rows, pending, offline, busy, now ->
+            TodayUi(groupRuns(rows, now), syncState(pending, offline), busy)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUi())
 
     fun refresh() {
