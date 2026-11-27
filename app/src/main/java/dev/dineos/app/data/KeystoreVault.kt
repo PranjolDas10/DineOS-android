@@ -7,7 +7,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import java.security.GeneralSecurityException
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -23,36 +25,41 @@ private val TOKENS = stringPreferencesKey("tokens")
  * on most phones), stored in DataStore. A refresh token is a long-lived credential: app-private
  * storage alone would hand it to anyone with a rooted phone or a backup of the app's data. */
 class KeystoreVault(private val store: DataStore<Preferences>) : TokenVault {
+    /** Asked for once. Fetching or generating the key is a call into the Keystore, which on a
+     * phone with a secure element takes tens of milliseconds, and the key never changes. */
+    private val key by lazy { loadKey() }
 
     override suspend fun read(): Tokens? {
         val saved = store.data.first()[TOKENS] ?: return null
-        return try {
-            val bytes = Base64.decode(saved, Base64.NO_WRAP)
-            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, bytes, 0, IV_BYTES))
-            val (access, refresh) = String(cipher.doFinal(bytes, IV_BYTES, bytes.size - IV_BYTES)).split("\n")
-            Tokens(access, refresh)
-        } catch (_: GeneralSecurityException) {
-            null // the key is gone (app data restored onto another phone): signed out, not a crash
-        } catch (_: RuntimeException) {
-            null // not what this version wrote
-        }
-    }
-
-    override suspend fun write(tokens: Tokens?) {
-        store.edit { prefs ->
-            if (tokens == null) {
-                prefs.remove(TOKENS)
-            } else {
+        // The Keystore and the cipher are blocking calls: this one runs while the app is deciding
+        // which screen to draw, so it must not happen on the main thread.
+        return withContext(Dispatchers.IO) {
+            try {
+                val bytes = Base64.decode(saved, Base64.NO_WRAP)
                 val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-                cipher.init(Cipher.ENCRYPT_MODE, key()) // a fresh random IV every time
-                val sealed = cipher.iv + cipher.doFinal("${tokens.access}\n${tokens.refresh}".toByteArray())
-                prefs[TOKENS] = Base64.encodeToString(sealed, Base64.NO_WRAP)
+                cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(128, bytes, 0, IV_BYTES))
+                val (access, refresh) = String(cipher.doFinal(bytes, IV_BYTES, bytes.size - IV_BYTES)).split("\n")
+                Tokens(access, refresh)
+            } catch (_: GeneralSecurityException) {
+                null // the key is gone (app data restored onto another phone): signed out, not a crash
+            } catch (_: RuntimeException) {
+                null // not what this version wrote
             }
         }
     }
 
-    private fun key(): SecretKey {
+    override suspend fun write(tokens: Tokens?) {
+        val sealed = tokens?.let {
+            withContext(Dispatchers.IO) {
+                val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+                cipher.init(Cipher.ENCRYPT_MODE, key) // a fresh random IV every time
+                Base64.encodeToString(cipher.iv + cipher.doFinal("${it.access}\n${it.refresh}".toByteArray()), Base64.NO_WRAP)
+            }
+        }
+        store.edit { prefs -> if (sealed == null) prefs.remove(TOKENS) else prefs[TOKENS] = sealed }
+    }
+
+    private fun loadKey(): SecretKey {
         val keystore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         (keystore.getKey(KEY_ALIAS, null) as? SecretKey)?.let { return it }
         val spec = KeyGenParameterSpec.Builder(KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)

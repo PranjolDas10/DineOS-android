@@ -25,6 +25,18 @@ android {
         versionName = "0.1.0"
         buildConfigField("String", "API_URL", "\"${apiUrl.get()}\"")
     }
+    buildTypes {
+        release {
+            // R8 shrinks and obfuscates, and drops unused resources. No rules of our own: every
+            // library that needs them (Retrofit, kotlinx-serialization, Room, Hilt, WorkManager,
+            // OkHttp) ships its own consumer rules inside its artifact, and the generated API
+            // client is plain interfaces and @Serializable data classes those rules already
+            // cover. Add a proguard-rules.pro here the day something actually breaks.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+        }
+    }
     buildFeatures {
         compose = true
         buildConfig = true

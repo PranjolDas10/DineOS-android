@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The dashboard's mark (web/src/app/icon.svg), scaled into the adaptive icon's 66dp safe
+     circle: a plate ring with the first quarter filled. Emerald #34D399 is the accent token
+     (emerald.400): the share that was kept. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M54,54V27A27,27 0 0 1 81,54Z" />
+    <path
+        android:pathData="M54,27A27,27 0 1,0 54,81A27,27 0 1,0 54,27Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6.23" />
+</vector>

@@ -10,6 +10,7 @@ import dev.dineos.app.ui.syncState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.Instant
 
 class ChecklistTest {
     private fun row(item: String, checked: Boolean, run: String = "run") =
@@ -42,9 +43,13 @@ class ChecklistTest {
 
     @Test
     fun `rows group into runs and count what is done`() {
-        val runs = groupRuns(listOf(row("a", true), row("b", false), row("c", true, run = "late")))
+        val rows = listOf(row("a", true), row("b", false), row("c", true, run = "late"))
+        val runs = groupRuns(rows, now = Instant.parse("2026-11-15T03:00:00Z"))
         assertEquals(listOf("run" to 1, "late" to 1), runs.map { it.id to it.done })
         assertEquals(listOf(false, true), runs.map { it.complete })
+        // Every row here is due at 04:00Z: overdue is read from the clock the caller passes in.
+        assertEquals(listOf(false, false), runs.map { it.overdue })
+        assertEquals(listOf(true, true), groupRuns(rows, now = Instant.parse("2026-11-15T04:00:01Z")).map { it.overdue })
     }
 
     @Test

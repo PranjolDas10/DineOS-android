@@ -15,7 +15,7 @@ This first slice does one job well: **tonight's closing checklist, checked off o
 
 | Concern | Choice |
 |---|---|
-| UI | Jetpack Compose, Material 3, colors generated from the dashboard's `tokens.json` |
+| UI | Jetpack Compose, Material 3, colors generated from the dashboard's `tokens.json`, Geist bundled (SIL OFL, `third_party/geist`) |
 | State | MVVM: `ViewModel` + `StateFlow`, Hilt for injection |
 | Local data | Room is the source of truth; the screen never reads the network |
 | Sync | An op queue in Room, drained by WorkManager (network constraint, backoff) |
@@ -42,8 +42,8 @@ Demo account (after `python -m app.seed` in the backend): `demo@dineos.dev` / `d
 
 ## Contract with the backend
 
-`contract/openapi.json` and `design/tokens.json` are copies from the DineOS repo. `scripts/sync-contract.sh` refreshes them. The Kotlin API client is generated from the spec on every build, so an API change that breaks the app breaks the build first.
+`contract/openapi.json` and `design/tokens.json` are copies from the DineOS repo. `scripts/sync-contract.sh` refreshes them and reruns `design/build-tokens.mjs`, which writes `Tokens.kt` for Compose and `res/values*/colors.xml` for the launch window and the launcher icon. The Kotlin API client is generated from the spec on every build, so an API change that breaks the app breaks the build first.
 
 ## Not here yet
 
-Receipt scanning, stock counts, orders, photo proof on checklist items, push alerts, the conflict merge screen for record edits, the Geist typeface.
+Receipt scanning, stock counts, orders, photo proof on checklist items, push alerts, the conflict merge screen for record edits.

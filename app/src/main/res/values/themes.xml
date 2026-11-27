@@ -1,6 +1,8 @@
 <resources>
-    <!-- Only what shows before Compose draws: the window background. Colors live in Tokens.kt. -->
+    <!-- Only what shows before Compose draws: the window background, from the generated bg token
+         (colors.xml). The light/dark pair of platform parents is what gives the status bar its
+         dark icons for the moment before the activity sets them. -->
     <style name="Theme.DineOS" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/token_bg</item>
     </style>
 </resources>
