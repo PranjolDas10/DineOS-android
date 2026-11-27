@@ -71,7 +71,6 @@ import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -87,8 +86,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-// Digits of equal width, so "7 / 9" doesn't shift when it becomes "8 / 9".
-private const val TABULAR = "tnum"
 private val Clock = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
 
 @Composable
@@ -205,7 +202,7 @@ fun TodayScreen(vm: TodayViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.today_title), fontWeight = FontWeight.SemiBold) },
+                title = { Text(stringResource(R.string.today_title)) },
                 actions = {
                     SyncChip(ui.sync)
                     IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, stringResource(R.string.menu_more)) }
@@ -228,7 +225,7 @@ fun TodayScreen(vm: TodayViewModel) {
                 if (ui.runs.isEmpty() && !ui.refreshing) {
                     item {
                         Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(stringResource(R.string.today_empty_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.today_empty_title), style = MaterialTheme.typography.titleMedium)
                             Text(
                                 stringResource(if (ui.sync is SyncState.Offline) R.string.today_empty_offline else R.string.today_empty_body),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -263,12 +260,8 @@ private fun RunHeader(run: RunUi) {
     val due = Clock.format(run.dueAt.atZone(ZoneId.systemDefault()))
     Column(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(run.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f).semantics { heading() })
-            Text(
-                stringResource(R.string.run_progress, run.done, run.items.size),
-                style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = TABULAR),
-                fontWeight = FontWeight.SemiBold,
-            )
+            Text(run.name, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f).semantics { heading() })
+            Text(stringResource(R.string.run_progress, run.done, run.items.size), style = MaterialTheme.typography.titleLarge)
         }
         LinearProgressIndicator(
             progress = { if (run.items.isEmpty()) 0f else run.done.toFloat() / run.items.size },
